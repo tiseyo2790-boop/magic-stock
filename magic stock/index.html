@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🪄📊 주가의 마법사 🧙✨</title>
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --container-bg: white;
+            --text-color: #1e293b;
+            --sub-text: #64748b;
+            --input-bg: #fdfdfd;
+            --input-border: #e2e8f0;
+            --section-border: #e2e8f0;
+            --calc-bg: #f8fafc;
+            --point-color: #6666FF;
+        }
+
+        [data-theme='dark'] {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --sub-text: #94a3b8;
+            --input-bg: #334155;
+            --input-border: #475569;
+            --section-border: #334155;
+            --calc-bg: #111827;
+        }
+
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; padding: 15px; transition: background 0.3s; margin: 0; }
+        .container { background: var(--container-bg); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 500px; box-sizing: border-box; transition: background 0.3s; }
+        
+        /* 헤더: 아이디 제거, 버튼 사이즈 고정, 프사 그림자 */
+        .credit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .profile-link { display: flex; align-items: center; text-decoration: none; }
+        .profile-img { 
+            width: 42px; height: 42px; border-radius: 50%; 
+            border: none; /* 테두리 제거 */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* 그림자 추가 */
+            transition: transform 0.2s;
+            background: #eee;
+        }
+        .profile-img:active { transform: scale(0.9); }
+
+        .theme-toggle { 
+            background: var(--input-bg); border: 1.5px solid var(--input-border); color: var(--text-color); 
+            width: 105px; height: 38px; border-radius: 10px; cursor: pointer; 
+            font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+
+        h2 { text-align: center; margin: 10px 0; font-size: 22px; letter-spacing: -0.5px; }
+        .disclaimer { font-size: 11px; color: var(--sub-text); text-align: center; margin-bottom: 20px; line-height: 1.6; word-break: keep-all; }
+        
+        /* 검색 섹션 모바일 최적화 */
+        .search-section { background: var(--point-color); padding: 15px; border-radius: 15px; margin-bottom: 25px; color: white; }
+        .search-group { display: flex; gap: 8px; }
+        .search-group input { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; outline: none; min-width: 0; }
+        .search-btn { background: #1e293b; color: white; border: none; padding: 0 15px; border-radius: 10px; font-weight: bold; cursor: pointer; white-space: nowrap; font-size: 14px; }
+
+        .section-title { font-size: 15px; font-weight: 700; margin: 20px 0 12px; border-bottom: 2px solid var(--section-border); padding-bottom: 5px; }
+        .input-group { margin-bottom: 12px; }
+        label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--sub-text); margin-bottom: 6px; }
+        .val-label { color: var(--point-color); font-weight: 800; }
+        
+        input[type="text"], input[type="number"] { width: 100%; padding: 12px; border: 1.5px solid var(--input-border); border-radius: 10px; font-size: 14px; box-sizing: border-box; background-color: var(--input-bg); color: var(--text-color); -webkit-appearance: none; }
+
+        .slider-container { margin: 10px 0 25px; }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--sub-text); margin-top: 5px; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--section-border); border-radius: 5px; outline: none; margin: 15px 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: var(--point-color); border-radius: 50%; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        .calc-display { background: var(--calc-bg); padding: 12px; border-radius: 12px; margin: 25px 0; border: 1px dashed var(--input-border); text-align: center; }
+        .calc-display p { margin: 4px 0; font-size: 13px; font-weight: 600; }
+        .highlight { color: var(--point-color); font-weight: 800; }
+        
+        .result-box { background: #1e293b; color: white; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 15px; }
+        .result-box label { justify-content: center; color: rgba(255,255,255,0.7); margin-bottom: 5px; font-size: 13px; }
+        .fair-price { font-size: 28px; font-weight: 800; color: #00d4ff; margin: 10px 0; }
+        
+        .status-box { padding: 14px; border-radius: 12px; text-align: center; font-weight: 700; font-size: 13px; line-height: 1.4; word-break: keep-all; }
+        .strong-buy { background-color: #059669; color: white; }
+        .buy { background-color: #dcfce7; color: #166534; }
+        .hold { background-color: #f1f5f9; color: #475569; }
+        .sell { background-color: #fee2e2; color: #991b1b; }
+        .strong-sell { background-color: #dc2626; color: white; }
+
+        .loader { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .footer-spacer { height: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="credit-header">
+        <a href="https://twitter.com/yodelohee_dee" target="_blank" class="profile-link">
+            <img src="https://unavatar.io/twitter/yodelohee_dee" class="profile-img" alt="Profile">
+        </a>
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 다크 모드</button>
+    </div>
+    
+    <h2>주가의 마법사 🧙‍♂️</h2>
+    <div class="disclaimer">공공데이터포털 API를 통해 국내 주가를 분석합니다.<br>본 도구는 참고용이며 투자 책임은 본인에게 있습니다.</div>
+    
+    <div class="search-section">
+        <div class="search-group">
+            <input type="text" id="itmsNm" placeholder="종목명 입력 (예: 삼성전자)">
+            <button class="search-btn" onclick="fetchStockData()" id="searchBtn">
+                <div class="loader" id="loader"></div>
+                <span id="btnText">검색</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="section-title">🏢 분석하고자 하는 기업에 대해 알려드려요.</div>
+    <div class="input-group">
+        <label>현재 주가 (원)</label>
+        <input type="number" id="currentPrice" value="0" oninput="run()">
+    </div>
+    <div class="input-group">
+        <label>EPS (주당순이익, 원)</label>
+        <input type="number" id="eps" value="0" oninput="run()">
+    </div>
+    <div class="input-group">
+        <label>ROE (자기자본이익률, %) / 배당성향 (%)</label>
+        <div style="display: flex; gap: 8px;">
+            <input type="number" id="roe" placeholder="ROE" value="0" step="0.1" oninput="run()">
+            <input type="number" id="payout" placeholder="배당" value="0" step="0.1" oninput="run()">
+        </div>
+    </div>
+    <div class="input-group">
+        <label>할인율 (회사채 3년물 기준, %)</label>
+        <input type="number" id="yield" value="4.24" step="0.01" oninput="run()">
+    </div>
+
+    <div class="section-title">🧠 당신의 생각을 알려주세요.</div>
+    <div class="slider-container">
+        <label>투자 성향: 위험에 대한 당신의 태도는 어떤가요? <span class="val-label" id="w1-label">1.00x</span></label>
+        <input type="range" id="riskWeight" min="0.8" max="1.2" step="0.01" value="1.0" oninput="run()">
+        <div class="slider-labels"><span>위험 기피</span><span>위험 중립</span><span>위험 선호</span></div>
+    </div>
+
+    <div class="slider-container">
+        <label>시장 전망: 현재 시장의 전망을 어떻게 보시나요? <span class="val-label" id="w2-label">1.00x</span></label>
+        <input type="range" id="marketWeight" min="0.8" max="1.2" step="0.01" value="1.0" oninput="run()">
+        <div class="slider-labels"><span>부정</span><span>중립</span><span>긍정</span></div>
+    </div>
+
+    <div class="slider-container">
+        <label>업종 전망: 해당 기업이 속한 업종의 전망을 어떻게 보시나요? <span class="val-label" id="w3-label">1.00x</span></label>
+        <input type="range" id="sectorWeight" min="0.8" max="1.2" step="0.01" value="1.0" oninput="run()">
+        <div class="slider-labels"><span>부정</span><span>중립</span><span>긍정</span></div>
+    </div>
+
+    <div class="slider-container">
+        <label>정성 평가: 평소 해당 기업을 어떻게 생각하셨나요? <span class="val-label" id="w4-label">1.00x</span></label>
+        <input type="range" id="esgWeight" min="0.8" max="1.2" step="0.01" value="1.0" oninput="run()">
+        <div class="slider-labels"><span>부정</span><span>중립</span><span>긍정</span></div>
+    </div>
+
+    <div class="calc-display">
+        <p>지속가능 성장률: <span class="highlight" id="g-display">0%</span></p>
+        <p>당신의 가중치: <span class="highlight" id="total-weight-display">1.00x</span></p>
+    </div>
+
+    <div class="result-box">
+        <label id="result-text">🧙: 제가 생각한 이 기업의 적정 주가는···</label>
+        <div class="fair-price" id="fair-val">0 원</div>
+    </div>
+
+    <div id="status" class="status-box hold">데이터를 입력하세요.</div>
+    <div class="footer-spacer"></div>
+</div>
+
+<script>
+    const SERVICE_KEY = 'e4f42cfc9d6808045b42172ece0524fac332632f34efe1c6bf1fc7d29a96a53f'; 
+
+let currentCompanyName = ""; 
+
+async function fetchStockData() {
+    const itmsNm = document.getElementById('itmsNm').value.trim();
+    if (!itmsNm) return;
+
+    const loader = document.getElementById('loader');
+    const btnText = document.getElementById('btnText');
+    const searchBtn = document.getElementById('searchBtn');
+
+    loader.style.display = 'block';
+    btnText.style.display = 'none';
+    searchBtn.disabled = true;
+
+    try {
+        const priceUrl = `/proxy/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey=${SERVICE_KEY}&itmsNm=${encodeURIComponent(itmsNm)}&numOfRows=1&resultType=json`;
+        const priceRes = await fetch(priceUrl);
+        const priceData = await priceRes.json();
+        console.log("Price Data:", priceData);
+        const priceItem = priceData.response?.body?.items?.item?.[0];
+
+        if (!priceItem) {
+            const errMsg = priceData.response?.header?.resultMsg || "데이터를 찾을 수 없음";
+            throw new Error(errMsg);
+        }
+
+        currentCompanyName = itmsNm;
+        document.getElementById('currentPrice').value = parseInt(priceItem.clpr);
+        const crno = priceItem.crno;
+
+        const finaUrl = `/proxy/1160100/service/GetFinaStatInfoService_V2/getFinaStatInfo?serviceKey=${SERVICE_KEY}&crno=${crno}&numOfRows=50&resultType=json`;
+        const fRes = await fetch(finaUrl);
+        const fData = await fRes.json();
+        const finaItems = fData.response?.body?.items?.item;
+
+        if (finaItems) {
+            let netIncome = 0; let totalEquity = 0; let cashDividend = 0;
+            finaItems.forEach(item => {
+                const nm = item.account_nm;
+                const val = parseFloat(item.thstrm_amt || 0);
+                if (nm.includes("당기순이익")) netIncome = val;
+                if (nm.includes("자본총계")) totalEquity = val;
+                if (nm.includes("현금배당금총액") || nm === "현금배당") cashDividend = val;
+                
+                if (item.eps && item.eps != "0") document.getElementById('eps').value = Math.round(item.eps);
+                if (item.roe && item.roe != "0") document.getElementById('roe').value = parseFloat(item.roe).toFixed(2);
+            });
+
+            if (totalEquity !== 0 && netIncome !== 0) {
+                const calcRoe = (netIncome / totalEquity) * 100;
+                if (!document.getElementById('roe').value || document.getElementById('roe').value === "0") {
+                    document.getElementById('roe').value = calcRoe.toFixed(2);
+                }
+            }
+        }
+
+        const yieldUrl = `/proxy/1160100/service/GetBondYieldInfoService/getBondYieldInfo?serviceKey=${SERVICE_KEY}&numOfRows=30&resultType=json`;
+        const yieldRes = await fetch(yieldUrl);
+        const yieldData = await yieldRes.json();
+        const yItems = yieldData.response?.body?.items?.item;
+        const bond = yItems?.find(i => i.itmsNm.includes("회사채") && i.itmsNm.includes("3년") && i.itmsNm.includes("AA-"));
+        if (bond) document.getElementById('yield').value = parseFloat(bond.trqu || bond.basPntct).toFixed(2);
+
+        run(); 
+
+    } catch (e) {
+        console.error("오류 발생 원인:", e.message);
+        // 키가 문제라면 'SERVICE_KEY_IS_NOT_REGISTERED' 같은 메시지가 출력됩니다.
+        alert(`오류: ${e.message}\nAPI 키 등록 상태나 인코딩을 확인해주세요.`);
+    } finally {
+        loader.style.display = 'none';
+        btnText.style.display = 'block';
+        searchBtn.disabled = false;
+    }
+}
+
+function run() {
+    const current = parseFloat(document.getElementById('currentPrice').value) || 0;
+    const eps = parseFloat(document.getElementById('eps').value) || 0;
+    const roe = parseFloat(document.getElementById('roe').value) || 0;
+    const payout = parseFloat(document.getElementById('payout').value) || 0;
+    const y = parseFloat(document.getElementById('yield').value) || 4.24;
+    
+    const w1 = parseFloat(document.getElementById('riskWeight').value);
+    const w2 = parseFloat(document.getElementById('marketWeight').value);
+    const w3 = parseFloat(document.getElementById('sectorWeight').value);
+    const w4 = parseFloat(document.getElementById('esgWeight').value);
+    
+    document.getElementById('w1-label').innerText = w1.toFixed(2) + "x";
+    document.getElementById('w2-label').innerText = w2.toFixed(2) + "x";
+    document.getElementById('w3-label').innerText = w3.toFixed(2) + "x";
+    document.getElementById('w4-label').innerText = w4.toFixed(2) + "x";
+
+    const totalW = w1 * w2 * w3 * w4;
+    document.getElementById('total-weight-display').innerText = totalW.toFixed(2) + "x";
+
+    const g = roe * (1 - (payout / 100));
+    document.getElementById('g-display').innerText = g.toFixed(2) + "%";
+
+    const fair = (eps * (8.5 + 1.5 * g) * 4.4 * totalW) / y;
+    const fairPrice = Math.round(fair);
+    
+    const resultLabel = document.getElementById('result-text');
+    if (resultLabel) {
+        resultLabel.innerText = currentCompanyName 
+            ? `🧙: 제가 생각한 ${currentCompanyName}의 적정 주가는···` 
+            : `🧙: 제가 생각한 적정 주가는···`;
+    }
+    
+    document.getElementById('fair-val').innerText = (fairPrice > 0 ? fairPrice.toLocaleString() : 0) + " 원";
+
+    const statusDiv = document.getElementById('status');
+    if (current <= 0 || eps <= 0) {
+        statusDiv.innerText = "✨ 데이터를 입력하면 마법을 부려볼게요. 🪄";
+        statusDiv.className = "status-box hold";
+    } else {
+        const gap = (fairPrice - current) / fairPrice;
+        if (gap >= 0.15) {
+            statusDiv.innerText = "🔥 아주 저렴합니다! 매수를 강력히 추천합니다. 🤑";
+            statusDiv.className = "status-box strong-buy";
+        } else if (gap > 0.05) {
+            statusDiv.innerText = "🚀 저렴합니다. 매수를 추천합니다. ✨";
+            statusDiv.className = "status-box buy";
+        } else if (gap < -0.15) {
+            statusDiv.innerText = "🛑 너무 비쌉니다! 매도를 강력히 권장합니다. 🙅";
+            statusDiv.className = "status-box strong-sell";
+        } else if (gap < -0.05) {
+            statusDiv.innerText = "⚠️ 비쌉니다. 매도를 검토하세요. 📉";
+            statusDiv.className = "status-box sell";
+        } else {
+            statusDiv.innerText = "⚖️ 적당합니다. 계속 보유하세요. 🙂‍↕️";
+            statusDiv.className = "status-box hold";
+        }
+    }
+}
+
+    function toggleTheme() {
+        const body = document.body;
+        const isDark = body.getAttribute('data-theme') === 'dark';
+        body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        document.getElementById('themeBtn').innerText = isDark ? "🌙 다크 모드" : "☀️ 화이트 모드";
+    }
+
+    window.onload = run;
+</script>
+</body>
+</html>
